@@ -55,7 +55,7 @@ jobs:
             cd ${{ matrix.dir }}
             pwd
             terraform init
-            terraform plan -var-file "../../../../terraform/common/cpi/tfvars/common.tfvars" -var-file "../../../../terraform/common/cpi/tfvars/stg.tfvars" -compact-warnings -parallelism 10 -no-color -out ./.terraform/default.plan
+            terraform plan -var-file "../../../../terraform/common/tfvars/common.tfvars" -var-file "../../../../terraform/common/tfvars/dev.tfvars" -compact-warnings -parallelism 10 -no-color -out ./.terraform/default.plan
             terraform apply ./.terraform/default.plan -no-color
           fi
 
