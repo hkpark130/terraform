@@ -1,0 +1,87 @@
+name: Terraform Apply common Dev
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  apply:
+    name: Apply
+    runs-on: ubuntu-latest
+    environment: PORTFOLIO
+    strategy:
+      matrix:
+        dir: [
+          terraform/common/dev/services/
+        ]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+
+      # push 할 때 comment step 에서 context.issue.number 가 undefined 인 문제 해결
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findpr
+        with:
+          state: all
+
+      # terraform setup
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.2
+
+      # credentials 설정 portfolio
+      - name: configure AWS credentials for portfolio
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_DEV }} --profile portfolio
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} --profile portfolio
+          aws configure set aws-region ${{ secrets.AWS_REGION }} --profile portfolio
+
+      # terraform apply
+      # git diff 로 common 에 차이가 있다면 apply 실행
+      # terraform plan 실행후 default.plan 파일을 terraform apply 에서 불러옴
+      - name: terraform apply
+        continue-on-error: true
+        id: apply
+        run: |
+          DIFF=$(git diff --name-only HEAD^ | grep -e $(echo ${{ matrix.dir }} |cut -f 2 -d "/"))
+          echo ${DIFF}
+          if [[ ${DIFF} = *common* ]]; then
+            cd ${{ matrix.dir }}
+            pwd
+            terraform init
+            terraform plan -var-file "../../../../terraform/common/tfvars/common.tfvars" -var-file "../../../../terraform/common/tfvars/dev.tfvars" -compact-warnings -parallelism 10 -no-color -out ./.terraform/default.plan
+            terraform apply ./.terraform/default.plan -no-color
+          fi
+
+      # comment
+      # apply 실행후 bot이 커멘트
+      - name: comment
+        if: ${{ steps.apply.outcome == 'success' }}
+        uses: actions/github-script@v6.1.0
+        env:
+          APPLY: "terraform¥n${{ steps.apply.outputs.stdout }}"
+          GITHUB_ISSUE_NUMBER: ${{ steps.findpr.outputs.pr }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `## \`${{ matrix.dir }}\`
+            #### Terraform Apply \`${{ steps.apply.outcome }}\`
+
+            <details><summary>Show Apply</summary>
+
+            \`\`\`${process.env.APPLY}\`\`\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: process.env.GITHUB_ISSUE_NUMBER,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
