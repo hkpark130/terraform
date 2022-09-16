@@ -4,7 +4,8 @@ variable "account_id" {}
 variable "env" {}
 
 data "aws_iam_policy_document" "pipeline_s3_policy" {
-  version = "2012-10-17"
+  version   = "2012-10-17"
+  policy_id = "SSEAndSSLPolicy"
   statement {
     sid = "DenyUnEncryptedObjectUploads"
     actions = [
