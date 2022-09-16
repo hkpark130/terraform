@@ -25,6 +25,5 @@ fmt:
 plan: fmt
 	terraform plan $(VAR_OPTIONS) \
 	-compact-warnings \
+	-parallelism 10 \
 	-out $(PLAN_OUT)
-
-# | grep -v -e 'Refresh state...' -e 'Reading...' -e 'Read complete'
