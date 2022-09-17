@@ -12,16 +12,18 @@ resource "aws_codepipeline" "codepipeline" {
 
   stage {
     name = "Source"
-
+    
     action {
       name             = "Source"
+      namespace = "SourceVariables"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
       version          = "1"
-      output_artifacts = ["source_output"]
+      output_artifacts = ["SourceArtifact"]
 
       configuration = {
+        ConnectionArn = aws_codestarconnections_connection.github.arn
         FullRepositoryId = "hkpark130/go-jwt"
         BranchName       = "main"
         OutputArtifactFormat = "CODE_ZIP"
@@ -34,6 +36,7 @@ resource "aws_codepipeline" "codepipeline" {
 
     action {
       name            = "Deploy"
+      namespace = "DeployVariables"
       category        = "Deploy"
       owner           = "AWS"
       provider        = "CodeDeploy"
@@ -53,13 +56,13 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-# resource "aws_codestarconnections_connection" "example" {
-#   name          = "${local.fqn}-connection"
-#   provider_type = "GitHub"
-# }
+resource "aws_codestarconnections_connection" "github" {
+  name          = "hkpark130"
+  provider_type = "GitHub"
+}
 
 resource "aws_iam_role" "go_jwt_codepipeline_role" {
-  name               = "${local.fqn}-codepipeline-role"
+  name               = "AWSCodePipelineServiceRole-ap-northeast-2-go-jwt-pipeline"
   assume_role_policy = data.aws_iam_policy_document.go_jwt_codepipeline_iam_role.json
-  
+  path = "/service-role/"
 }
