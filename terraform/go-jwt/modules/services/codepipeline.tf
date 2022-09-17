@@ -61,5 +61,4 @@ resource "aws_codepipeline" "codepipeline" {
 resource "aws_iam_role" "go_jwt_codepipeline_role" {
   name               = "${local.fqn}-codepipeline-role"
   assume_role_policy = data.aws_iam_policy_document.go_jwt_codepipeline_iam_role.json
-  
 }
