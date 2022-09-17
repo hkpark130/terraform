@@ -1,0 +1,93 @@
+name: Terraform Plan project Dev
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    environment: PORTFOLIO
+    strategy:
+      matrix:
+        dir: [
+          terraform/go-jwt/
+        ]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      # main과 diff 확인
+      - name: check diff
+        id: diff
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            ${{ matrix.dir }}/dev/services/*.tf
+
+      # credentials 설정 portfolio
+      - name: configure AWS credentials for staging
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_DEV }} --profile portfolio
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} --profile portfolio
+          aws configure set aws-region ${{ secrets.AWS_REGION }}  --profile portfolio
+
+      # terraform setup
+      # main과 차이가 없는 경우 skip
+      - name: setup terraform
+        id: setup
+        if: steps.diff.outputs.diff
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.2
+
+      # terraform 초기설정
+      # main과 차이가 없는 경우 skip
+      - name: terraform init
+        id: init
+        if: steps.diff.outputs.diff
+        run: terraform init
+        working-directory: ${{ matrix.dir }}dev/services/
+
+      # terraform plan
+      # main과 차이가 없는 경우 skip
+      - name: terraform plan
+        if: steps.diff.outputs.diff
+        id: plan
+        run: |
+          terraform plan \
+          -var-file "../../../../${{ matrix.dir }}tfvars/common.tfvars" \
+          -var-file "../../../../${{ matrix.dir }}tfvars/dev.tfvars" \
+          -compact-warnings -parallelism 10 -no-color
+        working-directory: ${{ matrix.dir }}dev/services/
+        continue-on-error: true
+
+      # comment
+      # main과 차이가 없는 경우 skip
+      - name: comment
+        if: steps.diff.outputs.diff
+        uses: actions/github-script@v6.1.0
+        env:
+          PLAN: "terraform¥n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let project = ${{ matrix.dir }}.split("/")[1];
+            const output = `## \`${{ project }}\`
+            #### Terraform Plan \`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`${process.env.PLAN}\`\`\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
