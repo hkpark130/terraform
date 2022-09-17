@@ -18,18 +18,6 @@ data "aws_iam_policy_document" "go_jwt_codepipeline_iam_role" {
   }
 }
 
-data "aws_iam_policy_document" "go_jwt_codepipeline_iam_role_policy" {
-  statement {
-    actions = [
-      "codebuild:StartBuild",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
 locals {
   service = "go-jwt"
 
