@@ -71,7 +71,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let project = ${{ matrix.dir }}.split("/")[1];
-            const output = `## \`${{ project }}\`
+            const output = `## \`${ project }\`
             #### Terraform Apply \`${{ steps.apply.outcome }}\`
 
             <details><summary>Show Apply</summary>
