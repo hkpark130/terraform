@@ -7,7 +7,7 @@
 % aws --version
 ```
 
-### aws 명령어를 사용할 수 있는지 확인
+### credentials 설정후 aws 명령어를 사용할 수 있는지 확인
 ```sh
 % aws s3 ls --profile portfolio
 ```
