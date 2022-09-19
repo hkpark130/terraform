@@ -29,7 +29,7 @@ jobs:
             ${{ matrix.dir }}/*.tf
 
       # credentials 설정 portfolio
-      - name: configure AWS credentials for staging
+      - name: configure AWS credentials for portfolio
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_DEV }} --profile portfolio
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} --profile portfolio
