@@ -13,7 +13,8 @@ jobs:
     strategy:
       matrix:
         dir: [
-          terraform/go-jwt/
+          terraform/go-jwt/,
+          terraform/spring-blog/
         ]
 
     steps:
