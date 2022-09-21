@@ -5,7 +5,7 @@ variable "product" {}
 variable "env" {}
 variable "default_description" {}
 
-module "go-jwt" {
+module "spring-blog" {
   source = "../../modules/services/"
 
   tf_state            = var.tf_state
