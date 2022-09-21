@@ -2,7 +2,7 @@
 # spring-blog code pipeline
 ##############################
 resource "aws_codepipeline" "codepipeline" {
-  name     = "spring-blog-pipeline"
+  name     = "spring-blog"
   role_arn = aws_iam_role.spring_blog_codepipeline_role.arn
 
   artifact_store {
@@ -24,8 +24,8 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ConnectionArn = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "hkpark130/spring-blog"
-        BranchName       = "main"
+        FullRepositoryId = "hkpark130/Spring-Blog"
+        BranchName       = "master"
         OutputArtifactFormat = "CODE_ZIP"
       }
     }
@@ -44,8 +44,8 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ApplicationName     = "spring-blog"
-        DeploymentGroupName = "spring-blog-deploy-group"
+        ApplicationName     = "spring-blog-deploy"
+        DeploymentGroupName = "spring"
       }
     }
   }
@@ -62,7 +62,7 @@ resource "aws_codestarconnections_connection" "github" {
 }
 
 resource "aws_iam_role" "spring_blog_codepipeline_role" {
-  name               = "AWSCodePipelineServiceRole-ap-northeast-2-spring-blog-pipeline"
+  name               = "AWSCodePipelineServiceRole-ap-northeast-2-spring-blog"
   assume_role_policy = data.aws_iam_policy_document.spring_blog_codepipeline_iam_role.json
   path = "/service-role/"
 }
