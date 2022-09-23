@@ -23,3 +23,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "source_artifact" 
     }
   }
 }
+
+output "source_artifact_s3" {
+  value = aws_s3_bucket.source_artifact.bucket
+}
