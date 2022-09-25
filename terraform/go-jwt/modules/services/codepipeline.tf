@@ -6,7 +6,7 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.go_jwt_codepipeline_role.arn
 
   artifact_store {
-    location = "codepipeline-ap-northeast-2-586294528232"
+    location = data.terraform_remote_state.common.outputs.source_artifact_s3
     type     = "S3"
   }
 
@@ -15,7 +15,7 @@ resource "aws_codepipeline" "codepipeline" {
     
     action {
       name             = "Source"
-      namespace = "SourceVariables"
+      namespace        = "SourceVariables"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
@@ -23,9 +23,9 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["SourceArtifact"]
 
       configuration = {
-        ConnectionArn = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "hkpark130/go-jwt"
-        BranchName       = "main"
+        ConnectionArn        = data.terraform_remote_state.common.outputs.github_connection
+        FullRepositoryId     = "hkpark130/go-jwt"
+        BranchName           = "main"
         OutputArtifactFormat = "CODE_ZIP"
       }
     }
@@ -36,7 +36,7 @@ resource "aws_codepipeline" "codepipeline" {
 
     action {
       name            = "Deploy"
-      namespace = "DeployVariables"
+      namespace       = "DeployVariables"
       category        = "Deploy"
       owner           = "AWS"
       provider        = "CodeDeploy"
@@ -56,13 +56,8 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-resource "aws_codestarconnections_connection" "github" {
-  name          = "hkpark130"
-  provider_type = "GitHub"
-}
-
 resource "aws_iam_role" "go_jwt_codepipeline_role" {
   name               = "AWSCodePipelineServiceRole-ap-northeast-2-go-jwt-pipeline"
   assume_role_policy = data.aws_iam_policy_document.go_jwt_codepipeline_iam_role.json
-  path = "/service-role/"
+  path               = "/service-role/"
 }
