@@ -14,7 +14,8 @@ jobs:
       matrix:
         dir: [
           terraform/go-jwt/,
-          terraform/spring-blog/
+          terraform/spring-blog/,
+          terraform/react-intro/,
         ]
 
     steps:
