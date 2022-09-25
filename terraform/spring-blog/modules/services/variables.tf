@@ -18,6 +18,17 @@ data "aws_iam_policy_document" "spring_blog_codepipeline_iam_role" {
   }
 }
 
+data "terraform_remote_state" "common" {
+  backend = "s3"
+
+  config = {
+    profile = "portfolio"
+    region  = "ap-northeast-2"
+    bucket  = "hkpark-terraform-s3-state"
+    key     = "common/dev/services/terraform.tfstate"
+  }
+}
+
 locals {
   service = "spring-blog"
 
