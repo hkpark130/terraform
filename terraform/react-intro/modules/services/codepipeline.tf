@@ -1,9 +1,9 @@
 ##############################
-# go jwt code pipeline
+# react-intro code pipeline
 ##############################
 resource "aws_codepipeline" "codepipeline" {
-  name     = "go-jwt-pipeline"
-  role_arn = aws_iam_role.go_jwt_codepipeline_role.arn
+  name     = "react-intro-pipe"
+  role_arn = aws_iam_role.react_intro_codepipeline_role.arn
 
   artifact_store {
     location = data.terraform_remote_state.common.outputs.source_artifact_s3
@@ -24,8 +24,9 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ConnectionArn        = data.terraform_remote_state.common.outputs.github_connection
-        FullRepositoryId     = "hkpark130/go-jwt"
-        BranchName           = "main"
+        FullRepositoryId     = "hkpark130/React-Intro"
+        BranchName           = "master"
+        DetectChanges        = true
         OutputArtifactFormat = "CODE_ZIP"
       }
     }
@@ -44,8 +45,8 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ApplicationName     = "go-jwt"
-        DeploymentGroupName = "go-jwt-deploy-group"
+        ApplicationName     = "deploy-app"
+        DeploymentGroupName = "react"
       }
     }
   }
@@ -56,8 +57,8 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-resource "aws_iam_role" "go_jwt_codepipeline_role" {
-  name               = "AWSCodePipelineServiceRole-ap-northeast-2-go-jwt-pipeline"
-  assume_role_policy = data.aws_iam_policy_document.go_jwt_codepipeline_iam_role.json
+resource "aws_iam_role" "react_intro_codepipeline_role" {
+  name               = "AWSCodePipelineServiceRole-ap-northeast-2-react-intro-pipe"
+  assume_role_policy = data.aws_iam_policy_document.react_intro_codepipeline_iam_role.json
   path               = "/service-role/"
 }

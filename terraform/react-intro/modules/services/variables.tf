@@ -5,7 +5,7 @@ variable "product" {}
 variable "env" {}
 variable "default_description" {}
 
-data "aws_iam_policy_document" "go_jwt_codepipeline_iam_role" {
+data "aws_iam_policy_document" "react_intro_codepipeline_iam_role" {
   statement {
     principals {
       type        = "Service"
@@ -30,7 +30,7 @@ data "terraform_remote_state" "common" {
 }
 
 locals {
-  service = "go-jwt"
+  service = "react-intro"
 
   fqn = "${local.service}-${var.env}"
 }
