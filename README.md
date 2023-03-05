@@ -20,4 +20,10 @@
 % terraform version
 ```
 
-
+## 로컬에서 Import
+```sh
+% cd path/to/Project Folder
+% make setup
+% terraform import -var-file "../../tfvars/common.tfvars" -var-file "../../tfvars/dev.tfvars" aws_instance.this i-~
+% make plan
+```
