@@ -64,7 +64,6 @@ resource "aws_security_group" "this" {
       "119.201.72.35/32",
       "221.110.31.103/32",
       "221.149.51.217/32",
-      "13.209.1.56/29", # TODO: 출처 검증 후 제거 또는 유지 결정
     ]
   }
 
@@ -105,7 +104,7 @@ resource "aws_security_group" "this" {
   }
 
   ingress {
-    description = "Laravel internal nginx (admin from home IP)"
+    description = "Laravel internal nginx (home IP + self-SG)"
     from_port   = 8201
     to_port     = 8201
     protocol    = "tcp"
@@ -114,7 +113,7 @@ resource "aws_security_group" "this" {
   }
 
   ingress {
-    description = "MySQL (admin from home IP)"
+    description = "MySQL (home IP + self-SG)"
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
