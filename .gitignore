@@ -10,3 +10,7 @@
 
 # vscode
 .vscode
+
+# Claude Code
+.claude/
+CLAUDE.md
