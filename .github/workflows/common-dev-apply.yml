@@ -60,9 +60,9 @@ jobs:
           fi
 
       # comment
-      # apply 실행후 bot이 커멘트
+      # apply 실행후 PR 이 연결된 경우에만 코멘트 (release 직접 push 시 PR 못 찾으면 스킵)
       - name: comment
-        if: ${{ steps.apply.outcome == 'success' }}
+        if: ${{ steps.apply.outcome == 'success' && steps.findpr.outputs.pr != '' }}
         uses: actions/github-script@v6.1.0
         env:
           APPLY: "terraform¥n${{ steps.apply.outputs.stdout }}"
